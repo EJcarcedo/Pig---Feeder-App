@@ -7,7 +7,7 @@ const Stack = createNativeStackNavigator();
 
 function StartScreen( {navigation} ) {
   return (
-    <TouchableOpacity  onPress={() => navigation.navigate('Type')} style={styles.container}>
+    <TouchableOpacity  onPress={() => navigation.navigate('Options')} style={styles.container}>
     <View style={styles.container}>
     <Image source={require('../Images/1.png')} style={{width: 400, height: 400, alignItems: 'center',}} />
     <Text style={styles.text1}>Smart Swine Feeder</Text>

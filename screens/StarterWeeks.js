@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, BackHandler } from 'react-native';
 
-const DetailsScreen = ({ navigation }) => {
+const StarterWeeks = ({ navigation, route }) => {
   const [distance1, setDistance1] = useState('Full');
   const [distance2, setDistance2] = useState('Half Full');
 
@@ -41,34 +41,48 @@ const DetailsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 10, marginTop: 1 }}>
+            Starter Weeks
+        </Text>
+
+         <TouchableOpacity
+            style={styles.button1}
+            onPress={() => {
+                navigation.navigate('Options')}}
+          >
+            <Text style={styles.buttonText}>back</Text>
+          </TouchableOpacity>
+        
       <TouchableOpacity
         accessibilityRole="button"
         style={styles.button}
-        onPress={() => navigation.navigate('Options')}
+        onPress={feeding}
       >
-        <Text style={styles.buttonText}>Feed Now</Text>
+        <Text style={styles.buttonText}>4 - 8 Weeks</Text>
       </TouchableOpacity>
+   
       <TouchableOpacity
         accessibilityRole="button"
         style={styles.button}
-        onPress={() => navigation.navigate('Schedule')}
+        onPress={feeding}
+      >
+        <Text style={styles.buttonText}>8 - 10 Weeks</Text>
+      </TouchableOpacity>
+    <TouchableOpacity
+        accessibilityRole="button"
+        style={styles.button}
+        onPress={() => navigation.navigate('Schedule', { previousScreen: 'Starter' })}
       >
         <Text style={styles.buttonText}>Schedule</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        accessibilityRole="button"
-        style={styles.button}
-        onPress={handlePress}
-      >
-        <Text style={styles.buttonText}>Exit</Text>
-      </TouchableOpacity>
+
       <Text style={styles.sensorData}>Feed Container: {distance1}</Text>
       <Text style={styles.sensorData}>Water Container: {distance2}</Text>
     </View>
   );
 };
 
-export default DetailsScreen;
+export default StarterWeeks;
 
 const styles = StyleSheet.create({
   container: {
@@ -83,6 +97,15 @@ const styles = StyleSheet.create({
     width: 336,
     height: 58,
     margin: 10,
+  },
+  button1: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: '#313833',
+    padding: 5,
+    borderRadius: 5,
+    marginTop: 50
   },
   buttonText: {
     fontSize: 24,

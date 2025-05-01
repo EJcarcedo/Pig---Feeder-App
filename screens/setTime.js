@@ -104,7 +104,7 @@ const SetAlarmScreen = () => {
       <View style={styles.container}>
       
       <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 10, marginTop: 50 }}>
-        {route.params?.previousScreen || 'Set Alarm'} Schedule
+        {route.params?.previousScreen?.replace('Weeks', '') || 'Set Alarm'} Schedule
       </Text>
 
       <Text style={styles.label}>Hour</Text>
@@ -140,9 +140,17 @@ const SetAlarmScreen = () => {
       </View>
 
       <Button title="Save Schedule" onPress={saveSchedule} testID="save-schedule-button" />
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Schedule')} testID="cancel-button">
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.replace('Schedule', {
+            previousScreen: route.params?.previousScreen,
+          })
+        }
+      >
         <Text style={styles.buttonText}>Cancel</Text>
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -183,7 +191,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#ccc',
+    backgroundColor: '#000',
     borderRadius: 5,
     alignItems: 'center',
   },

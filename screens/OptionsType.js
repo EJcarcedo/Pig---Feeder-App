@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, BackHandler } from 'react-native';
 
-const DetailsScreen = ({ navigation }) => {
+const OptionsType = ({ navigation, route }) => {
   const [distance1, setDistance1] = useState('Full');
   const [distance2, setDistance2] = useState('Half Full');
 
@@ -27,48 +27,63 @@ const DetailsScreen = ({ navigation }) => {
     );
   };
 
-  const feeding = () => {
-    Alert.alert(
-      "Confirm Process",
-      "Are you sure you want to feed now?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Dry Feeds", onPress: () => console.log("Dry Feeds activated") },
-        { text: "Wet Feeds", onPress: () => console.log("Wet Feeds activated") }
-      ]
-    );
-  };
+  // const feeding = () => {
+  //   Alert.alert(
+  //     "Confirm Process",
+  //     "Are you sure you want to feed now?",
+  //     [
+  //       { text: "Cancel", style: "cancel" },
+  //       { text: "Dry Feeds", onPress: () => console.log("Dry Feeds activated") },
+  //       { text: "Wet Feeds", onPress: () => console.log("Wet Feeds activated") }
+  //     ]
+  //   );
+  // };
 
   return (
     <View style={styles.container}>
+        {/* <TouchableOpacity
+            style={styles.button1}
+                onPress={() => {
+                    if (route.params?.previousScreen) {
+                        navigation.navigate(route.params.previousScreen);
+                    } else {
+                        navigation.goBack();
+                    }
+                      
+                    }}
+        >
+                    <Text style={styles.buttonText}>back</Text>
+                  </TouchableOpacity> */}
       <TouchableOpacity
         accessibilityRole="button"
         style={styles.button}
-        onPress={() => navigation.navigate('Options')}
+        onPress={() => navigation.navigate('Starter')}
       >
-        <Text style={styles.buttonText}>Feed Now</Text>
+        <Text style={styles.buttonText}>Starter</Text>
       </TouchableOpacity>
       <TouchableOpacity
         accessibilityRole="button"
         style={styles.button}
-        onPress={() => navigation.navigate('Schedule')}
+        onPress={() => navigation.navigate('Grower')}
       >
-        <Text style={styles.buttonText}>Schedule</Text>
+        <Text style={styles.buttonText}>Grower</Text>
       </TouchableOpacity>
       <TouchableOpacity
         accessibilityRole="button"
         style={styles.button}
-        onPress={handlePress}
+        onPress={() => navigation.navigate('Finisher')}
       >
-        <Text style={styles.buttonText}>Exit</Text>
+        <Text style={styles.buttonText}>Finisher</Text>
       </TouchableOpacity>
+
+
       <Text style={styles.sensorData}>Feed Container: {distance1}</Text>
       <Text style={styles.sensorData}>Water Container: {distance2}</Text>
     </View>
   );
 };
 
-export default DetailsScreen;
+export default OptionsType;
 
 const styles = StyleSheet.create({
   container: {
@@ -83,6 +98,15 @@ const styles = StyleSheet.create({
     width: 336,
     height: 58,
     margin: 10,
+  },
+  button1: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: '#313833',
+    padding: 5,
+    borderRadius: 5,
+    marginTop: 50
   },
   buttonText: {
     fontSize: 24,
