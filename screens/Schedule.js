@@ -1,24 +1,61 @@
 import { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Button, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRef } from 'react';
+
 
 function ScheduleScreen({ route, navigation }) {
   const [schedules, setSchedules] = useState([]);
-  
+  const lastTriggered = useRef({});
 
-  useEffect(() => {
-    const loadSchedules = async () => {
-      try {
-        const storedSchedules = await AsyncStorage.getItem('schedules');
-        if (storedSchedules) {
-          setSchedules(JSON.parse(storedSchedules));
-        }
-      } catch (error) {
-        console.error('Error loading schedules:', error);
+  
+useEffect(() => {
+  const loadSchedules = async () => {
+    try {
+      const storedSchedules = await AsyncStorage.getItem('schedules');
+      if (storedSchedules) {
+        setSchedules(JSON.parse(storedSchedules));
       }
-    };
-    loadSchedules();
-  }, [route.params?.schedules]);
+    } catch (error) {
+      console.error('Error loading schedules:', error);
+    }
+  };
+
+  loadSchedules();
+
+  const interval = setInterval(() => {
+    checkForScheduleMatch();
+  }, 15000); // Check every 15 seconds
+
+  return () => clearInterval(interval); // Cleanup on unmount
+}, [route.params?.schedules, schedules]); // Optional: include `schedules` to ensure it’s up to date
+
+const checkForScheduleMatch = () => {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const currentDay = now.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
+
+  schedules.forEach((schedule, index) => {
+    const { hour, minute, repeatDays, source } = schedule;
+
+    if (repeatDays[currentDay]) {
+      const scheduleKey = `${index}-${currentHour}-${currentMinute}`;
+      if (!lastTriggered.current[scheduleKey]) {
+        if (parseInt(hour) === currentHour && parseInt(minute) === currentMinute) {
+          Alert.alert("Feeding Started", `Feeding sequence of type ${source || 'Unknown'} started`);
+
+          lastTriggered.current[scheduleKey] = true;
+
+          setTimeout(() => {
+            Alert.alert("Feeding Completed", `Feeding sequence of type ${source || 'Unknown'} completed`);
+          }, 10000); // 10 seconds
+        }
+      }
+    }
+  });
+};
+
 
   const cancelSchedule = async (index) => {
     if (index < 0 || index >= schedules.length) {

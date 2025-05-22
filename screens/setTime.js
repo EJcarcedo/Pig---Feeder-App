@@ -7,6 +7,7 @@ import { useRoute } from '@react-navigation/native';
 
 
 const SetAlarmScreen = () => {
+  
   const [selectedHour, setSelectedHour] = useState('12 AM');
   const [selectedMinute, setSelectedMinute] = useState('00');
   const [selectedSecond] = useState('00');
@@ -15,6 +16,7 @@ const SetAlarmScreen = () => {
     Sun: false, Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false,
   });
   const [schedules, setSchedules] = useState([]);
+
   const maxSchedules = 7;
   const route = useRoute();
   const previousScreen = route.params?.previousScreen || 'Set Alarm'; // fallback title

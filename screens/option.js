@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, BackHandler } from 'react-native';
 
+
 const DetailsScreen = ({ navigation }) => {
+  
   const [distance1, setDistance1] = useState('Full');
   const [distance2, setDistance2] = useState('Half Full');
 
