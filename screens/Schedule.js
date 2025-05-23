@@ -7,55 +7,69 @@ import { useRef } from 'react';
 function ScheduleScreen({ route, navigation }) {
   const [schedules, setSchedules] = useState([]);
   const lastTriggered = useRef({});
+  const feedType1 = 'Wet';
 
-  
-useEffect(() => {
-  const loadSchedules = async () => {
-    try {
-      const storedSchedules = await AsyncStorage.getItem('schedules');
-      if (storedSchedules) {
-        setSchedules(JSON.parse(storedSchedules));
+  const intervalId = useRef(null);
+
+  useEffect(() => {
+    if (intervalId.current) return; // prevent duplicate intervals
+
+    const loadSchedules = async () => {
+      try {
+        const storedSchedules = await AsyncStorage.getItem('schedules');
+        if (storedSchedules) {
+          setSchedules(JSON.parse(storedSchedules));
+        }
+      } catch (error) {
+        console.error('Error loading schedules:', error);
       }
-    } catch (error) {
-      console.error('Error loading schedules:', error);
-    }
-  };
+    };
 
-  loadSchedules();
+    loadSchedules();
+    const interval = setInterval(async () => {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      const currentSecond = now.getSeconds(); // NEW: check seconds
+      const currentDay = now.toLocaleString('en-US', { weekday: 'short' });
+      const today = now.toLocaleDateString();
+      if (currentSecond !== 0) return; // only run once per minute at second 0
 
-  const interval = setInterval(() => {
-    checkForScheduleMatch();
-  }, 15000); // Check every 15 seconds
+      const storedSchedules = await AsyncStorage.getItem('schedules');
+      if (!storedSchedules) return;
+      const currentSchedules = JSON.parse(storedSchedules);
 
-  return () => clearInterval(interval); // Cleanup on unmount
-}, [route.params?.schedules, schedules]); // Optional: include `schedules` to ensure it’s up to date
+      currentSchedules.forEach((schedule, index) => {
+        const { hour, minute, repeatDays, source, weekRange, feedType } = schedule;
 
-const checkForScheduleMatch = () => {
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentDay = now.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
 
-  schedules.forEach((schedule, index) => {
-    const { hour, minute, repeatDays, source } = schedule;
+        const scheduleHour = parseInt(hour, 10);
+        const scheduleMinute = parseInt(minute, 10);
+        const scheduleKey = `${today}-${index}-${scheduleHour}-${scheduleMinute}`;
 
-    if (repeatDays[currentDay]) {
-      const scheduleKey = `${index}-${currentHour}-${currentMinute}`;
-      if (!lastTriggered.current[scheduleKey]) {
-        if (parseInt(hour) === currentHour && parseInt(minute) === currentMinute) {
-          Alert.alert("Feeding Started", `Feeding sequence of type ${source || 'Unknown'} started`);
-
+        if (
+          repeatDays[currentDay] &&
+          scheduleHour === currentHour &&
+          scheduleMinute === currentMinute &&
+          !lastTriggered.current[scheduleKey]
+        ) {
           lastTriggered.current[scheduleKey] = true;
+
+          console.log(" Feeding started", scheduleKey);
+          Alert.alert("Feeding Started", `Feeding sequence of type ${source || 'Unknown'} started`);
 
           setTimeout(() => {
             Alert.alert("Feeding Completed", `Feeding sequence of type ${source || 'Unknown'} completed`);
-          }, 10000); // 10 seconds
+          }, 10000);
         }
-      }
-    }
-  });
-};
+      });
+    }, 1000); // check every 1 second
 
+    return () => {
+      clearInterval(intervalId.current);
+      intervalId.current = null;
+    };
+  }, []);
 
   const cancelSchedule = async (index) => {
     if (index < 0 || index >= schedules.length) {
@@ -67,7 +81,7 @@ const checkForScheduleMatch = () => {
       const updatedSchedules = schedules.filter((_, i) => i !== index);
       setSchedules(updatedSchedules);
       await AsyncStorage.setItem('schedules', JSON.stringify(updatedSchedules));
-      Alert.alert('Success', 'Schedule cancelled locally');
+      Alert.alert('Success', 'Schedule cancelled ');
     } catch (error) {
       console.error('Error cancelling schedule:', error.message);
       Alert.alert('Error', 'Failed to cancel schedule');
@@ -93,8 +107,7 @@ const checkForScheduleMatch = () => {
       .map(([day]) => shortNames[day])
       .join(', ');
   };
-  
-  
+
 
   return (
     <View style={styles.container}>
@@ -116,11 +129,16 @@ const checkForScheduleMatch = () => {
       {schedules.length > 0 ? (
         <ScrollView style={styles.scheduleList}>
           {schedules.map((schedule, index) => (
-            <View key={index} style={styles.scheduleItem}>
+            <View key={index} style={styles.cardBox}>
               <Text style={styles.fonts}>{formatTime(schedule.hour, schedule.minute)}</Text>
               <Text style={styles.font}>Repeat Days: {formatRepeatDays(schedule.repeatDays)}</Text>
               <Text style={styles.font}> Type: {schedule.source || 'Unknown'}</Text>
-              <Button title="Cancel" onPress={() => cancelSchedule(index)} />
+              <Text style={styles.font}> Week: {schedule.weekRange || 'Unknown'}</Text>
+              <Text style={styles.font}> Feed Type: {schedule.feedType === 1 ? 'Dry' : 'Wet'}</Text>
+             <TouchableOpacity style={styles.cancelButton} onPress={() => cancelSchedule(index)}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+
             </View>
           ))}
         </ScrollView>
@@ -146,6 +164,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+    cardBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4, // Android shadow
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  cancelButton: {
+    marginTop: 10,
+    backgroundColor: '#ff6b6b',
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   scheduleList: {
     marginTop: 90,

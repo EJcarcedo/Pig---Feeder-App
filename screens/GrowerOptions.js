@@ -27,14 +27,22 @@ const GrowerOptions = ({ navigation }) => {
     );
   };
 
+  const papap = () => {
+      Alert.alert("Feeding Started", `Feeding sequence of type ${source || 'Unknown'} started`);
+
+          setTimeout(() => {
+            Alert.alert("Feeding Completed", `Feeding sequence of type ${source || 'Unknown'} completed`);
+          }, 10000);
+  };
+
   const feeding = () => {
     Alert.alert(
       "Confirm Process",
       "Are you sure you want to feed now?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Dry Feeds", onPress: () => console.log("Dry Feeds activated") },
-        { text: "Wet Feeds", onPress: () => console.log("Wet Feeds activated") }
+        { text: "Dry Feeds", onPress: papap},
+        { text: "Wet Feeds", onPress: papap}
       ]
     );
   };

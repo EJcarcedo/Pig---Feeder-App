@@ -16,6 +16,8 @@ const SetAlarmScreen = () => {
     Sun: false, Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false,
   });
   const [schedules, setSchedules] = useState([]);
+  const [selectedWeekRange, setSelectedWeekRange] = useState('10-13');
+
 
   const maxSchedules = 7;
   const route = useRoute();
@@ -25,6 +27,7 @@ const SetAlarmScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+  console.log('ScheduleScreen MOUNTED');
     const loadSchedules = async () => {
       const storedSchedules = await AsyncStorage.getItem('schedules');
       if (storedSchedules) {
@@ -32,7 +35,16 @@ const SetAlarmScreen = () => {
       }
     };
     loadSchedules();
+
   }, []);
+
+  const weekRanges = [
+  { key: '10-13', value: '10-13' },
+  { key: '13-15', value: '13-15' },
+  { key: '16-18', value: '16-18' },
+  { key: '19-20', value: '19-20' }
+];
+
 
   const hours = [
     { key: '12 AM', value: '12 AM' }, { key: '1 AM', value: '1 AM' }, { key: '2 AM', value: '2 AM' },
@@ -75,17 +87,19 @@ const SetAlarmScreen = () => {
       seconds: selectedSecond,
       repeatDays: repeatDays,
       feedType: feedTypeValue,
+      weekRange: selectedWeekRange, // ← NEW
       source: route.params?.previousScreen || 'Unknown',
     };
+
 
     try {
       const updatedSchedules = [...schedules, schedule];
       setSchedules(updatedSchedules);
       await AsyncStorage.setItem('schedules', JSON.stringify(updatedSchedules));
-      Alert.alert('Saved', 'Schedule saved locally');
+      Alert.alert('Saved', 'Schedule saved ');
       navigation.replace('Schedule', { schedules: updatedSchedules, previousScreen: route.params?.previousScreen });
     } catch (error) {
-      Alert.alert('Error', 'Failed to save schedule locally');
+      Alert.alert('Error', 'Failed to save schedule ');
       console.error(error);
     }
   };
@@ -128,6 +142,16 @@ const SetAlarmScreen = () => {
         />
       </View>
 
+       <Text style={styles.label}>Week Range</Text>
+      <View testID="select-week-range">
+        <SelectList
+          data={weekRanges}
+          setSelected={setSelectedWeekRange}
+          defaultOption={{ key: '10-13', value: '10-13' }}
+        />
+      </View>
+
+
       <View style={styles.repeatContainer}>
         {Object.keys(repeatDays).map((day) => (
           <TouchableOpacity
@@ -140,6 +164,7 @@ const SetAlarmScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
+     
 
       <Button title="Save Schedule" onPress={saveSchedule} testID="save-schedule-button" />
       <TouchableOpacity

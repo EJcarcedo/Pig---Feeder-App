@@ -13,7 +13,11 @@ import OptionsType from './screens/OptionsType';
 import StarterWeeks from './screens/StarterWeeks';
 import GrowerWeeks from './screens/GrowerWeeks';
 import FinisherWeeks from './screens/FinisherWeeks';
+import { LogBox } from 'react-native';
 
+LogBox.ignoreLogs([
+  'useInsertionEffect must not schedule updates'
+]);
 
 
 const Stack = createNativeStackNavigator(); 

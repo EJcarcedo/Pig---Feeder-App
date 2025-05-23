@@ -27,17 +27,25 @@ const GrowerWeeks = ({ navigation, route }) => {
     );
   };
 
-  const feeding = () => {
-    Alert.alert(
-      "Confirm Process",
-      "Are you sure you want to feed now?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Dry Feeds", onPress: () => console.log("Dry Feeds activated") },
-        { text: "Wet Feeds", onPress: () => console.log("Wet Feeds activated") }
-      ]
-    );
+  const papap = (source) => {
+      console.log(' papap called with:', source);
+      Alert.alert("Feeding Started", `Feeding sequence of type ${source || 'Unknown'} started`);
+      setTimeout(() => {
+        Alert.alert("Feeding Completed", `Feeding sequence of type ${source || 'Unknown'} completed`);
+      }, 10000);
   };
+
+ const feeding = (source2) => {
+  Alert.alert(
+    `Confirm Process Feed For ${source2 || 'Unknown'}`,
+    "Are you sure you want to feed now?",
+    [
+      { text: "Cancel", style: "cancel" },
+      { text: "Dry Feeds", onPress: () => papap(`Dry (${source2})`) },
+      { text: "Wet Feeds", onPress: () => papap(`Wet (${source2})`) }
+    ]
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -56,7 +64,7 @@ const GrowerWeeks = ({ navigation, route }) => {
          <TouchableOpacity
            accessibilityRole="button"
            style={styles.button}
-           onPress={feeding}
+            onPress={() => feeding('10-13 Weeks')}
          >
            <Text style={styles.buttonText}>10 - 13 Weeks</Text>
          </TouchableOpacity>
@@ -64,7 +72,7 @@ const GrowerWeeks = ({ navigation, route }) => {
          <TouchableOpacity
            accessibilityRole="button"
            style={styles.button}
-           onPress={feeding}
+           onPress={() => feeding('13-15 Weeks')}
          >
            <Text style={styles.buttonText}>13 - 15 Weeks</Text>
          </TouchableOpacity>
@@ -72,7 +80,7 @@ const GrowerWeeks = ({ navigation, route }) => {
          <TouchableOpacity
            accessibilityRole="button"
            style={styles.button}
-           onPress={feeding}
+            onPress={() => feeding('16-18 Weeks')}
          >
            <Text style={styles.buttonText}>16 - 18 Weeks</Text>
          </TouchableOpacity>
@@ -80,7 +88,7 @@ const GrowerWeeks = ({ navigation, route }) => {
          <TouchableOpacity
            accessibilityRole="button"
            style={styles.button}
-           onPress={feeding}
+            onPress={() => feeding('19-20 Weeks')}
          >
            <Text style={styles.buttonText}>19 - 20 Weeks</Text>
          </TouchableOpacity>
